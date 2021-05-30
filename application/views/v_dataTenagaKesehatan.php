@@ -117,10 +117,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       <?php echo $post->password; ?>
                     </td>
                     <td>
-						<ul class="d-flex justify-content-center">
-							<a href="javascript:void(0);" class="text-danger edit" data-id= "<?php echo $post->id; ?>" 
-								data-username="<?php echo $post->username; ?>" data-password="<?php echo $post->password; ?>" ><i class="ni ni-settings-gear-65" aria-hidden="true"></i></a>
-							<a href="<?= site_url('Stunting/deleteTenagaKesehatan/').$post->id; ?>" class="text-danger"><i class="ni ni-basket"></i></a>
+						<ul class="d-flex justify-content-left mt-3">
+							<a href="javascript:void(0);" class="text-danger edit mr-2 " data-id= "<?php echo $post->id; ?>" 
+								data-username="<?php echo $post->username; ?>" data-password="<?php echo $post->password; ?>" >
+								<i class="ni ni-settings-gear-65" aria-hidden="true"></i>
+							</a>
+							<a href="<?= site_url('Stunting/deleteTenagaKesehatan/').$post->id; ?>" class="text-danger ml-2">
+								<i class="ni ni-basket"></i>
+							</a>
 						</ul>
 					</td>
                   </tr>

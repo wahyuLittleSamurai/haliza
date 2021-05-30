@@ -17,17 +17,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <!-- Nav items -->
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link <?php echo $this->uri->segment(2) == '' ? 'active': '' ?>" href="<?= site_url('Stunting'); ?>">
+              <a class="nav-link <?php echo $this->uri->segment(2) == 'dashboard' ? 'active': '' ?>" href="<?= site_url('Stunting'); ?>">
                 <i class="ni ni-tv-2 text-primary"></i>
                 <span class="nav-link-text">Dashboard</span>
               </a>
             </li>
+			<?php if($this->session->userdata('user') == 'admin') { ?>
             <li class="nav-item">
               <a class="nav-link <?php echo $this->uri->segment(2) == 'TenagaKesehatan' ? 'active': '' ?>" href="<?= site_url('Stunting/TenagaKesehatan'); ?>">
                 <i class="ni ni-planet text-orange"></i>
                 <span class="nav-link-text">Data Tenaga Kesehatan</span>
               </a>
             </li>
+			<?php } ?>
             <li class="nav-item">
               <a class="nav-link <?php echo $this->uri->segment(2) == 'dataAnak' ? 'active': '' ?>" href="<?= site_url('Stunting/dataAnak'); ?>">
                 <i class="ni ni-pin-3 text-primary"></i>
@@ -38,6 +40,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <a class="nav-link <?php echo $this->uri->segment(2) == 'Stunting' ? 'active': '' ?>" href="<?= site_url('Stunting/newcalcStunting'); ?>">
                 <i class="ni ni-single-02 text-yellow"></i>
                 <span class="nav-link-text">Stunting</span>
+              </a>
+            </li>
+			<li class="nav-item">
+              <a class="nav-link <?php echo $this->uri->segment(2) == 'Logout' ? 'active': '' ?>" href="<?= site_url('Stunting/logout'); ?>">
+                <i class="ni ni-settings-gear-65 text-yellow"></i>
+                <span class="nav-link-text">Logout</span>
               </a>
             </li>
           </ul>

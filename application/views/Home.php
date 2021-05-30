@@ -124,10 +124,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					</div>
 					
 				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-theme">Edit Data</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
+				
 			</div>
 		</form>
 	</div>
@@ -138,70 +135,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <div class="card">
             <!-- Card header -->
             <div class="card-header border-0">
-              <h3 class="mb-0"><?php echo $tableTittle; ?></h3>
+              <h3 class="mb-0">Selamat Datang</h3>
 			  <div class="col text-right">
-                  <button type="button" data-toggle="modal" data-target="#myModal" class="btn btn-sm btn-primary">Tambah Data Anak</a>
-                  <!--<button type="button" data-toggle="modal" data-target="#myModal" class="btn btn-sm btn-warning" >Import From Excel</a>
-					-->
-			   </div>
+                  
+               </div>
             </div>
             <!-- Light table -->
-              <table class="table align-items-center table-flush" id="example">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col" >No</th>
-                    <th scope="col" >Id</th>
-                    <th scope="col" >Nama</th>
-                    <th scope="col" >Gender</th>
-                    <th scope="col" >Umur</th>
-                    <th scope="col" >Tinggi Badan</th>
-                    <th scope="col" >Berat Badan</th>
-                    <th scope="col" >Tgl Timbang</th>
-                    <th scope="col"> Action</th>
-                  </tr>
-                </thead>
-                <tbody class="list">
-				<?php $counting=0; foreach($posts as $post){ $counting++;?>
-                  <tr>
-                    <td scope="row">
-                      <?php echo $counting; ?>
-                    </td>
-					<td scope="row">
-                      <?php echo $post->id; ?>
-                    </td>
-					<td scope="row">
-                      <?php echo $post->nama; ?>
-                    </td>
-					<td scope="row">
-                      <?php echo $post->gender; ?>
-                    </td>
-					<td scope="row">
-                      <?php echo $post->umur; ?>
-                    </td>
-					<td scope="row">
-                      <?php echo $post->tb; ?>
-                    </td>
-					<td scope="row">
-                      <?php echo $post->bb; ?>
-                    </td>
-					<td scope="row">
-                      <?php echo $post->createat; ?>
-                    </td>
-                    <td>
-						<ul class="d-flex justify-content-left mt-3">
-							<a href="javascript:void(0);" class="text-danger edit mr-2" data-id= "<?php echo $post->id; ?>" 
-								data-nama="<?php echo $post->nama; ?>" data-umur="<?php echo $post->umur; ?>"
-								data-gender="<?php echo $post->gender; ?>"
-								data-tb="<?php echo $post->tb; ?>" data-bb="<?php echo $post->bb; ?>" >
-								<i class="ni ni-settings-gear-65" aria-hidden="true"></i></a>
-							<a href="<?= site_url('Stunting/deleteDataAnak/').$post->id; ?>" class="text-danger ml-2"><i class="ni ni-basket"></i></a>
-						</ul>
-					</td>
-                  </tr>
-				<?php } ?>
-                </tbody>
-              </table>
-            
+              
           </div>
         </div>
 	

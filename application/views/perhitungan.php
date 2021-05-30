@@ -1,201 +1,28 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+?>
 
-class Stunting extends CI_Controller {
-
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see https://codeigniter.com/user_guide/general/urls.html
-	 */
-	function __construct(){
-         parent::__construct();
-		 
-		 $this->load->helper('date'); 
-		 $this->load->helper(array('url','form'));
-		 $this->load->library('session');
-		 $this->load->database();
-		 $this->load->model('m_account');
-
-     }
-	public function logout()
-	{
-		$this->session->unset_userdata('user');
-		$this->load->view('v_login');
-	}
-	public function index()
-	{
-		if($this->session->userdata('user') == '')
-		{
-			$this->load->view('v_login');
-		}
-		else
-		{
-			redirect("Stunting/dashboard");
-		}
-	}
-	public function login()
-	{
-		$data["username"] = $this->input->post('username');
-		$data["password"] = $this->input->post('password');
-		if(!empty($data["username"]) && !empty($data["password"]) )
-		{
-			$getUser = $this->m_account->login($data);
-			if($getUser > 0)
-			{
-				$this->session->set_userdata('user', $data["username"]);
-				$this->dashboard();
-			}
-			else
-			{
-				$this->index();
-			}
-		}
-	}
-	public function dashboard()
-	{
-		$urlMain['urlMain'] = 'Dashboard';
-		$urlMain["content"] = $this->load->view('Home', NULL, true);
-		$this->load->view('Template/Main', $urlMain);	
-	}
-	
-	public function tenagaKesehatan()
-	{
-		if($this->session->userdata('user') == 'admin')
-		{
-			$this->data['posts'] = $this->m_account->getTenagaKesehatan();
-			$this->data['tableTittle'] = "Tabel Tenaga Kerja";
-			$data['content'] = $this->load->view('v_dataTenagaKesehatan', $this->data, true);
-			
-			$this->load->view('Template/Main', $data);
-		}
-		else{
-			redirect("Stunting");
-		}
-	}
-	
-	public function addTenagaKesehatan()
-	{
-		$data["username"] = $this->input->post('username');
-		$data["password"] = $this->input->post('password');
-		if(!empty($data["username"]) && !empty($data["password"]) )
-		{
-			$this->m_account->addTenagaKesehatan($data);
-			$this->tenagaKesehatan();
-		}
-	}
-	
-	public function editTenagaKesehatan()
-	{
-		$data["id"] = $this->input->post('idUser');
-		$data["username"] = $this->input->post('username');
-		$data["password"] = $this->input->post('password');
-		if(!empty($data["username"]) && !empty($data["password"]) )
-		{
-			$this->m_account->editTenagaKesehatan($data);
-			$this->tenagaKesehatan();
-		}
-	}
-	
-	public function deleteTenagaKesehatan($data)
-	{
-		$this->m_account->deleteTenagaKesehatan($data);
-		$this->tenagaKesehatan();
-	}
-	
-	public function dataAnak()
-	{
-		if($this->session->userdata('user') != '')
-		{
-			$this->data['posts'] = $this->m_account->getDataAnak();
-			$this->data['tableTittle'] = "Tabel Anak";
-			$data['content'] = $this->load->view('v_dataAnak', $this->data, true);
-			
-			$this->load->view('Template/Main', $data);
-		}
-		else
-		{
-			redirect("Stunting");
-		}
-	}
-	public function addDataAnak()
-	{
-		$data["nama"] = $this->input->post('nama');
-		$data["gender"] = $this->input->post('gender');
-		$data["umur"] = $this->input->post('umur');
-		$data["bb"] = $this->input->post('bb');
-		$data["tb"] = $this->input->post('tb');
-		if(!empty($data["nama"]) && !empty($data["gender"]) && !empty($data["umur"]) && !empty($data["bb"]) && !empty($data["tb"]) )
-		{
-			$this->m_account->addDataAnak($data);
-			$this->dataAnak();
-		}
-	}
-	public function editDataAnak()
-	{
-		$data["id"] = $this->input->post('id');
-		$data["nama"] = $this->input->post('nama');
-		$data["gender"] = $this->input->post('gender');
-		$data["umur"] = $this->input->post('umur');
-		$data["bb"] = $this->input->post('bb');
-		$data["tb"] = $this->input->post('tb');
-		if(!empty($data["nama"]) && !empty($data["gender"]) && !empty($data["umur"]) && !empty($data["bb"]) && !empty($data["tb"]) )
-		{
-			$this->m_account->editDataAnak($data);
-			$this->dataAnak();
-		}
-	}
-	public function deleteDataAnak($data)
-	{
-		$this->m_account->deleteDataAnak($data);
-		$this->dataAnak();
-	}
-	
-	function randomData($cluster)
-	{
-		$target = 100;
-		$n = $cluster;
-		$addends = array();
-		$results = array();
-		while ($n) 
-		{
-			if (1 < $n--) 
-			{
-					$addend = rand(1, $target - ($n - 1));
-					$target -= $addend;
-					$addends[] = $addend;
-			} 
-			else 
-			{
-					$addends[] = $target;
-			}
-		}
-		foreach($addends as $add)
-		{
-			$results[] = $add / 100;
-		}
-		return $results ;
-	}
-	function newRandom()
+<div class="col">
+          <div class="card">
+            <!-- Card header -->
+            <div class="card-header border-0">
+              <h3 class="mb-0">Kalkulasi</h3>
+			  <div class="col text-right">
+                  <button type="button" data-toggle="modal" data-target="#myModal" class="btn btn-sm btn-primary">Tambah Data Anak</a>
+                  <!--<button type="button" data-toggle="modal" data-target="#myModal" class="btn btn-sm btn-warning" >Import From Excel</a>
+					-->
+			   </div>
+            </div>
+            <!-- Light table -->
+              
+			  <?php 
+			  	function newRandom()
 	{
 		$data = rand(1, 99);
 		$data = $data / 100;
 		return $data;
-	}
-	public function newcalcStunting()
-	{
-		
-		
+	}	
+		/*
 $randData = array(
 array("0.508685702","0.130153266","0.999167462","0.558648655"),
 array("0.926765131","0.556507672","0.784142826","0.279297982"),
@@ -252,7 +79,7 @@ array("0.777162194","0.092417368","0.883736431","0.766398399"),
 array("0.498891199","0.78221903","0.55199867","0.305949399"),
 array("0.934874703","0.425734732","0.867430134","0.68419166")
 );
-
+*/
 
 
 		$query = "SELECT * FROM tblAnak";
@@ -273,108 +100,76 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 		echo "Data Max: ". $dataMax; echo "<br>";
 		
 		$dataAnak = $this->m_account->getDataAnak();
-		echo "<body style='text-align:center;'>
-				<style>
-					th, td{
-						padding: 10px;
-					}
-				
-				</style>
-	   
-	   ";
-	   echo "<h3>Tabel Data Anak</h3>";
-	   echo "<table cellpadding='0' cellspacing='0' border='1' style='margin-left:auto; margin-right:auto;'> 
-			<thead>
-			  <tr>
-				<th>Umur</th>
-				<th>Gender</th>
-				<th>BB</th>
-				<th>TB</th>
-				<th colspan='4'>Normalisasi</th>
-				<th colspan='4'>Data Cluster</th>
-			  </tr>
-			</thead>
-			<tbody>";
+		echo "table data anak <br>";
+		echo "<table style='border:1px solid black;'>";
+		echo "<tr><td>umur</td><td>gender</td><td>bb</td><td>tb</td>";
+		echo "<td>=></td><td>norm umur</td><td>norm gender</td><td>norm bb</td><td>norm tb</td>";
+		echo "<td>=></td><td>rand umur</td><td>rand gender</td><td>rand bb</td><td>rand tb</td></tr>";
 		$counting = 0;
 		foreach($dataAnak as $anak)
 		{
-			echo "<tr>";
-			echo "<td>".$anak->umur."</td>";
-			echo "<td >".$anak->gender."</td>";
-			echo "<td >".$anak->bb."</td>";
-			echo "<td >".$anak->tb."</td>";
+			echo "<tr style='border:1px solid black;'>";
+			echo "<td  style='border:1px solid black;'>".$anak->umur."</td>";
+			echo "<td  style='border:1px solid black;'>".$anak->gender."</td>";
+			echo "<td  style='border:1px solid black;'>".$anak->bb."</td>";
+			echo "<td  style='border:1px solid black;'>".$anak->tb."</td>";
 			
 			$dataNorm[$counting][0] = round(($var1 * ($anak->umur - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
 			$dataNorm[$counting][1] = round(($var1 * ($anak->gender - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
 			$dataNorm[$counting][2] = round(($var1 * ($anak->bb - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
 			$dataNorm[$counting][3] = round(($var1 * ($anak->tb - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
-			echo "<td >".$dataNorm[$counting][0]."</td>";
-			echo "<td >".$dataNorm[$counting][1]."</td>";
-			echo "<td >".$dataNorm[$counting][2]."</td>";
-			echo "<td >".$dataNorm[$counting][3]."</td>";
-			/* 
+			echo "<td  style='border:1px solid black;'> => </td>";
+			echo "<td  style='border:1px solid black;'>".$dataNorm[$counting][0]."</td>";
+			echo "<td  style='border:1px solid black;'>".$dataNorm[$counting][1]."</td>";
+			echo "<td  style='border:1px solid black;'>".$dataNorm[$counting][2]."</td>";
+			echo "<td  style='border:1px solid black;'>".$dataNorm[$counting][3]."</td>";
+			/* */
 			$randData[$counting][0] = $this->newRandom();
 			$randData[$counting][1] = $this->newRandom();
 			$randData[$counting][2] = $this->newRandom();
 			$randData[$counting][3] = $this->newRandom();
-			*/
+			/* */
 			$dataSum[$counting] = $randData[$counting][0] + $randData[$counting][1] + $randData[$counting][2] + $randData[$counting][3] ;
 			$randData[$counting][0] = round(($randData[$counting][0] / $dataSum[$counting]) , 5);
 			$randData[$counting][1] = round(($randData[$counting][1] / $dataSum[$counting]) , 5);
 			$randData[$counting][2] = round(($randData[$counting][2] / $dataSum[$counting]) , 5);
 			$randData[$counting][3] = round(($randData[$counting][3] / $dataSum[$counting]) , 5);
 			
-			echo "<td >".$randData[$counting][0]."</td>";
-			echo "<td >".$randData[$counting][1]."</td>";
-			echo "<td >".$randData[$counting][2]."</td>";
-			echo "<td >".$randData[$counting][3]."</td>";
+			echo "<td  style='border:1px solid black;'> => </td>";
+			echo "<td  style='border:1px solid black;'>".$randData[$counting][0]."</td>";
+			echo "<td  style='border:1px solid black;'>".$randData[$counting][1]."</td>";
+			echo "<td  style='border:1px solid black;'>".$randData[$counting][2]."</td>";
+			echo "<td  style='border:1px solid black;'>".$randData[$counting][3]."</td>";
 			
 			echo "<tr>";
 			
 			$counting++;
 		}
-		
-		echo "</tbody></table>";
+		echo "</table>";
 		
 		$iterasi = 1;
 		while($flagLooping == false)
 		{
 		
-			echo "<h3>Iterasi ".$iterasi."</h3>";
-			echo "<table cellpadding='0' cellspacing='0' border='1' style='margin-left:auto; margin-right:auto;'> 
-			<thead>
-			  <tr>
-				<th>MiU C1</th>
-				<th>MiU1</th>
-				<th>MiU2</th>
-				<th>MiU3</th>
-				<th>MiU4</th>
-				<th>MiU C2</th>
-				<th>MiU1</th>
-				<th>MiU2</th>
-				<th>MiU3</th>
-				<th>MiU4</th>
-				<th>MiU C3</th>
-				<th>MiU1</th>
-				<th>MiU2</th>
-				<th>MiU3</th>
-				<th>MiU4</th>
-				<th>MiU C4</th>
-				<th>MiU1</th>
-				<th>MiU2</th>
-				<th>MiU3</th>
-				<th>MiU4</th>
-			  </tr>
-			</thead>
-			<tbody>";
+			echo "<br><br> Iterasi " .$iterasi. " <br>";
+			echo "<table style='border:1px solid black;'>";
 			
+			echo "<tr><td>Miu</td><td>Miu 1</td><td>Miu 2</td><td>Miu 3</td><td>Miu 4</td>";
+			echo "<td>Miu</td><td>Miu 1</td><td>Miu 2</td><td>Miu 3</td><td>Miu 4</td>";
+			echo "<td>Miu</td><td>Miu 1</td><td>Miu 2</td><td>Miu 3</td><td>Miu 4</td>";
+			echo "<td>Miu</td><td>Miu 1</td><td>Miu 2</td><td>Miu 3</td><td>Miu 4</td></tr>";
+			echo "<tr><td>Cluster 1</td><td></td><td></td><td></td><td></td>";
+			echo "<td>Cluster 2</td><td></td><td></td><td></td><td></td>";
+			echo "<td>Cluster 3</td><td></td><td></td><td></td><td></td>";
+			echo "<td>Cluster 4</td><td></td><td></td><td></td><td></td></tr>";
+				
 			for($x = 0; $x < count($dataNorm); $x++)
 			{
 				echo "<tr>";
 				for($clus = 0; $clus < count($randData[$x]); $clus++)
 				{
 					$dataMiu[$x][0] = round(pow($randData[$x][$clus] , 2), 5);
-					echo "<td >".$dataMiu[$x][0]."</td>";		
+					echo "<td  style='border:1px solid black;'>".$dataMiu[$x][0]."</td>";		
 					$dataMiu2[$x][$clus] = $dataMiu[$x][0];
 					
 					if(empty($miuTotal[$clus][0])) { $miuTotal[$clus][0] = 0; }
@@ -383,7 +178,7 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 					for($y = 0; $y < count($dataNorm[$x]); $y++)
 					{
 						$dataMiu[$x][$y + 1] = round($dataMiu[$x][0] * $dataNorm[$x][$y], 5);
-						echo "<td >".$dataMiu[$x][$y + 1]."</td>";
+						echo "<td  style='border:1px solid black;'>".$dataMiu[$x][$y + 1]."</td>";
 						
 						if(empty($miuTotal[$clus][$y + 1])) { $miuTotal[$clus][$y + 1] = 0; }
 						$miuTotal[$clus][$y + 1] += $dataMiu[$x][$y + 1];
@@ -393,7 +188,7 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 				/* tampil total miu */
 				if($x == (count($dataNorm) -1))
 				{
-					echo "<tr><td colspan='20'>Total Miu</td></tr>";
+					echo "<tr><td>Total Miu</td></tr>";
 					//echo count($miuTotal) . " >> " . count($miuTotal[0]) . "<br>";
 					for($a = 0; $a < count($miuTotal); $a++)
 					{
@@ -410,23 +205,12 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 				
 			}
 			
-			echo "</tbody></table>";
+			echo "</table>";
 			
 			
 			/* calculasi pusat cluster */
-			echo "<br><h3>Pusat Cluster</h3>";
-			echo "<table cellpadding='0' cellspacing='0' border='1' style='margin-left:auto; margin-right:auto;'> 
-			<thead>
-			  <tr>
-				<th>Cluster 1</th>
-				<th>Cluster 2</th>
-				<th>Cluster 3</th>
-				<th>Cluster 4</th>
-				
-			  </tr>
-			</thead>
-			<tbody>";
 			
+			echo "<table><tr><td>Pusat Cluster</td></tr>";
 			//echo count($miuTotal) . " >> " . count($miuTotal[0]) . "<br>";
 			for($a = 0; $a < count($miuTotal); $a++)
 			{
@@ -434,40 +218,25 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 				for($b=1; $b < count($miuTotal[$a]); $b++)
 				{
 					$pusatCluster[$a][$b - 1] = round($miuTotal[$a][$b] / $miuTotal[$a][0], 5);
-					echo "<td >".$pusatCluster[$a][$b - 1]."</td>";
+					echo "<td style='border:1px solid black;'>".$pusatCluster[$a][$b - 1]."</td>";
 				}
 				echo "</tr>";
 			}
-			echo "</tr></tbody></table>";
+			echo "</tr></table>";
 			
 			/* calculasi fungsi objective */
 			$dataL = array(); $resultObjective = null;
 			$dataL_1 = array(); $totalL = array();
-			echo "<br><h3>Fungsi Objective </h3>";
-			echo "<table cellpadding='0' cellspacing='0' border='1' style='margin-left:auto; margin-right:auto;'> 
-			<thead>
-			  <tr>
-				<th>Miu^2 1</th>
-				<th>Miu^2 2</th>
-				<th>Miu^2 3</th>
-				<th>Miu^2 4</th>
-				<th>LT 1</th>
-				<th>LT 2</th>
-				<th>LT 3</th>
-				<th>LT 4</th>
-				<th>LT Total</th>
-				
-			  </tr>
-			</thead>
-			<tbody>";
+			echo "<table><tr><td>Fungsi Objective</td></tr>";
 			//echo count($miuTotal) . " >> " . count($miuTotal[0]) . "<br>";
 			for($x = 0; $x < count($dataMiu2); $x++)
 			{
 				echo "<tr>";
 				for($y = 0; $y < count($dataNorm[$x]); $y++)
 				{
-					echo "<td >" . $dataMiu2[$x][$y] . "</td>";
+					echo "<td style='border:1px solid black;'>" . $dataMiu2[$x][$y] . "</td>";
 				}
+				echo "<td> => </td>";
 				for($y = 0; $y < count($dataNorm[$x]); $y++)
 				{
 					for($z = 0; $z < count($pusatCluster)-1; $z++)
@@ -482,19 +251,19 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 					$totalL[$x] += $dataL_1[$x][$y];
 					
 					$resultObjective += $dataL[$x][$y];
-					echo "<td  >" . $dataL[$x][$y] . "</td>";
+					echo "<td style='border:1px solid black;'>" . $dataL[$x][$y] . "</td>";
 					
 				}
-				echo "<td>" . $totalL[$x] . "</td>";
 				echo "</tr>";
 			}
-			echo "</tr></tbody></table>";
+			echo "</tr></table>";
 			
 			/* result fungsi objective */
-			echo "<h3>Total Fungsi Objective = " . $resultObjective . "</h3>";
+			echo "total fungsi Objective = " . $resultObjective;
 			if($resultObjective <= $epsilon)
 			{
 				$flagLooping = true;
+				echo "<br> Selamat sudah selesai iterasi <br>";
 			}
 			
 			/* new Random */
@@ -519,20 +288,7 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 		/* rank pusat cluster */
 		$totalRangking = array(); $ranking = array();
 		
-		echo "<br><h3>Table Ranking Pusat Cluster</h3>";
-			echo "<table cellpadding='0' cellspacing='0' border='1' style='margin-left:auto; margin-right:auto;'> 
-			<thead>
-			  <tr>
-				<th>Cluster 1</th>
-				<th>Cluster 2</th>
-				<th>Cluster 3</th>
-				<th>Cluster 4</th>
-				<th>Total</th>
-				
-			  </tr>
-			</thead>
-			<tbody>";
-			
+		echo "Table Rangking <br><table>";
 		for($x = 0; $x < count($pusatCluster); $x++)
 		{
 			echo "<tr>";
@@ -545,45 +301,21 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 			echo "<td>" . $totalRangking[$x] . "</td>";
 			echo "</tr>";
 		}
-		echo "</tbody></table>";
-		echo "<br><h3>Ranking</h3>";
-			echo "<table cellpadding='0' cellspacing='0' border='1' style='margin-left:auto; margin-right:auto;'> 
-			<thead>
-			  <tr>
-				<th>Total Cluster</th>
-				<th>Result Ranking</th>
-				
-			  </tr>
-			</thead>
-			<tbody>";
-		
+		echo "</table><br>Rangking<br>";
 		$rangking = $totalRangking;
 		$indexRanking = array();
 		rsort($rangking);
 		for($index = 0; $index < count($totalRangking) ; $index++)
 		{
 			$indexRanking[$index] = array_search($totalRangking[$index], $rangking) + 1;
-			echo "<tr><td>" . $totalRangking[$index] . " </td><td> " .$indexRanking[$index] . "</td></tr>";
+			echo $totalRangking[$index] . " >> " .$indexRanking[$index] . "<br>";
 		}
-		echo "</tbody></table>";
 		
 		/* pengambilan keputusan */
 		$setNamaCluster = array("Tinggi", "Normal", "Pendek", "Sangat Pendek");
 		$maxRand = array(); $resultCluster = array();
-		echo "<br><h3>Table Hasil Perhitungan dan Pengambilan Keputusan</h3>";
-			echo "<table cellpadding='0' cellspacing='0' border='1' style='margin-left:auto; margin-right:auto;'> 
-			<thead>
-			  <tr>
-				<th>MiU pada Cluster 1</th>
-				<th>MiU pada Cluster 1</th>
-				<th>MiU pada Cluster 1</th>
-				<th>MiU pada Cluster 1</th>
-				<th>MAX</th>
-				<th>Result</th>
-				
-			  </tr>
-			</thead>
-			<tbody>";
+		echo "<br>Pengambilan keputusan<br>";
+		echo "<table style='border:1px solid black;'>";
 		for($x = 0; $x < count($randData); $x++)
 		{
 			echo "<tr>";
@@ -606,7 +338,10 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 			}
 			echo "</tr>";
 		}
-		echo "</tbody></table>";
-		echo "</body>";
-	}
-}
+		echo "</table>";
+			  
+			  ?>
+			  
+          </div>
+        </div>
+	
