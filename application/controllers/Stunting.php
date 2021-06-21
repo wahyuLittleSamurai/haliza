@@ -28,6 +28,40 @@ class Stunting extends CI_Controller {
 		 $this->load->model('m_account');
 
      }
+	 public function GetPusatCluster()
+	 {
+		$result["result"] = $this->m_account->getPusatCluster();
+		echo json_encode($result);
+	 }
+	 public function ConvertToExcel()
+	 {
+		 $this->data['hasil'] = $this->stuntingNoTbl();
+		 $this->data['posts'] = $this->m_account->getDataAnak();
+			
+		$this->load->view('Template/convertExcel', $this->data);
+	 }
+	public function SettingFuzzy()
+     {
+     	$result["data"] = $this->m_account->getSetting();
+     	$urlMain['urlMain'] = 'Setting Fuzzy';
+		$urlMain["content"] = $this->load->view('SettingFuzzy', $result, true);
+		$this->load->view('Template/Main', $urlMain);	
+     }
+	 public function EditSetting()
+     {
+     	$data = array(
+     		"jmlCluster" => $this->input->post("jmlCluster"),
+     		"pangkat" => $this->input->post("pangkat"),
+     		"maxIterasi" => $this->input->post("maxIterasi"),
+     		"errorTerkecil" => $this->input->post("errorTerkecil")
+     	);
+     	
+     	$result = $this->m_account->editSetting($data);
+     	
+     	redirect("/Stunting/SettingFuzzy");
+     	
+     	
+     }
 	public function logout()
 	{
 		$this->session->unset_userdata('user');
@@ -111,23 +145,9 @@ class Stunting extends CI_Controller {
 	{
 		$this->m_account->deleteTenagaKesehatan($data);
 		$this->tenagaKesehatan();
+		
 	}
 	
-	public function dataAnak()
-	{
-		if($this->session->userdata('user') != '')
-		{
-			$this->data['posts'] = $this->m_account->getDataAnak();
-			$this->data['tableTittle'] = "Tabel Anak";
-			$data['content'] = $this->load->view('v_dataAnak', $this->data, true);
-			
-			$this->load->view('Template/Main', $data);
-		}
-		else
-		{
-			redirect("Stunting");
-		}
-	}
 	public function addDataAnak()
 	{
 		$data["nama"] = $this->input->post('nama');
@@ -138,7 +158,7 @@ class Stunting extends CI_Controller {
 		if(!empty($data["nama"]) && !empty($data["gender"]) && !empty($data["umur"]) && !empty($data["bb"]) && !empty($data["tb"]) )
 		{
 			$this->m_account->addDataAnak($data);
-			$this->dataAnak();
+			$this->dataAnak(true);
 		}
 	}
 	public function editDataAnak()
@@ -158,7 +178,8 @@ class Stunting extends CI_Controller {
 	public function deleteDataAnak($data)
 	{
 		$this->m_account->deleteDataAnak($data);
-		$this->dataAnak();
+		//$this->dataAnak();
+		redirect("Stunting/dataAnak");
 	}
 	
 	function randomData($cluster)
@@ -195,7 +216,7 @@ class Stunting extends CI_Controller {
 	public function newcalcStunting()
 	{
 		
-		
+/*		
 $randData = array(
 array("0.508685702","0.130153266","0.999167462","0.558648655"),
 array("0.926765131","0.556507672","0.784142826","0.279297982"),
@@ -253,7 +274,8 @@ array("0.498891199","0.78221903","0.55199867","0.305949399"),
 array("0.934874703","0.425734732","0.867430134","0.68419166")
 );
 
-
+*/
+		$randData = array();
 
 		$query = "SELECT * FROM tblAnak";
 		$resultData = $this->db->query($query)->result();
@@ -261,7 +283,15 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 		$var1 = 0.8; $var2 = 0.1;
 		$dataNorm = array();  $dataMiu = array();
 		$miuTotal = array(); $pusatCluster = array();
-		$dataMiu2 = array(); $epsilon = 0.00001;
+		$dataMiu2 = array(); //$epsilon = 0.00001;
+		
+		$query="SELECT errorTerkecil FROM tblsetting";
+		$result = $this->db->query($query)->row()->errorTerkecil;
+		$epsilon = $result;
+		
+		$query = "SELECT maxIterasi from tblsetting";
+		$maxIterasi = $this->db->query($query)->row()->maxIterasi;
+		
 		$flagLooping = false;
 		
 		foreach($resultData as $data)
@@ -312,12 +342,12 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 			echo "<td >".$dataNorm[$counting][1]."</td>";
 			echo "<td >".$dataNorm[$counting][2]."</td>";
 			echo "<td >".$dataNorm[$counting][3]."</td>";
-			/* 
+			 
 			$randData[$counting][0] = $this->newRandom();
 			$randData[$counting][1] = $this->newRandom();
 			$randData[$counting][2] = $this->newRandom();
 			$randData[$counting][3] = $this->newRandom();
-			*/
+			
 			$dataSum[$counting] = $randData[$counting][0] + $randData[$counting][1] + $randData[$counting][2] + $randData[$counting][3] ;
 			$randData[$counting][0] = round(($randData[$counting][0] / $dataSum[$counting]) , 5);
 			$randData[$counting][1] = round(($randData[$counting][1] / $dataSum[$counting]) , 5);
@@ -427,18 +457,27 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 			</thead>
 			<tbody>";
 			
+			$queryCluster = "INSERT INTO tblpusatclsuter(cluster1, cluster2, cluster3,cluster4) VALUES";
+			
 			//echo count($miuTotal) . " >> " . count($miuTotal[0]) . "<br>";
 			for($a = 0; $a < count($miuTotal); $a++)
 			{
 				echo "<tr>";
+				$queryCluster .= "(";
 				for($b=1; $b < count($miuTotal[$a]); $b++)
 				{
 					$pusatCluster[$a][$b - 1] = round($miuTotal[$a][$b] / $miuTotal[$a][0], 5);
 					echo "<td >".$pusatCluster[$a][$b - 1]."</td>";
+					$queryCluster .= "'".$pusatCluster[$a][$b-1]."',";
 				}
+				$queryCluster = substr($queryCluster, 0, -1);
+				$queryCluster .= "),";
 				echo "</tr>";
 			}
 			echo "</tr></tbody></table>";
+			
+			$queryCluster = substr($queryCluster, 0, -1);
+			$this->db->query($queryCluster);
 			
 			/* calculasi fungsi objective */
 			$dataL = array(); $resultObjective = null;
@@ -506,7 +545,7 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 				}				
 			}
 			
-			if($iterasi == 10)
+			if($iterasi == $maxIterasi)
 			{
 				$flagLooping = true;
 			}
@@ -609,4 +648,204 @@ array("0.934874703","0.425734732","0.867430134","0.68419166")
 		echo "</tbody></table>";
 		echo "</body>";
 	}
+	
+	/* stunting tanpa table */
+	public function stuntingNoTbl()
+	{
+		$randData = array();
+			
+		$query = "SELECT * FROM tblAnak";
+		$resultData = $this->db->query($query)->result();
+		$dataMax = 0; $dataMin = 10000;
+		$var1 = 0.8; $var2 = 0.1;
+		$dataNorm = array();  $dataMiu = array();
+		$miuTotal = array(); $pusatCluster = array();
+		$dataMiu2 = array(); //$epsilon = 0.00001;
+		$flagLooping = false;
+	
+		$query="SELECT errorTerkecil FROM tblsetting";
+		$result = $this->db->query($query)->row()->errorTerkecil;
+		$epsilon = $result;
+		
+		$query = "SELECT maxIterasi from tblsetting";
+		$maxIterasi = $this->db->query($query)->row()->maxIterasi;
+		
+		
+		foreach($resultData as $data)
+		{
+			$dataMin = min($data->umur, $data->gender, $data->bb, $data->tb, $dataMin);
+			$dataMax = max($data->umur, $data->gender, $data->bb, $data->tb, $dataMax);
+		}
+		
+		$dataAnak = $this->m_account->getDataAnak();
+		$counting = 0;
+		foreach($dataAnak as $anak)
+		{
+			
+			$dataNorm[$counting][0] = round(($var1 * ($anak->umur - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
+			$dataNorm[$counting][1] = round(($var1 * ($anak->gender - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
+			$dataNorm[$counting][2] = round(($var1 * ($anak->bb - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
+			$dataNorm[$counting][3] = round(($var1 * ($anak->tb - $dataMin) / ($dataMax - $dataMin) + $var2) , 5);
+			
+			$randData[$counting][0] = $this->newRandom();
+			$randData[$counting][1] = $this->newRandom();
+			$randData[$counting][2] = $this->newRandom();
+			$randData[$counting][3] = $this->newRandom();
+			
+			$dataSum[$counting] = $randData[$counting][0] + $randData[$counting][1] + $randData[$counting][2] + $randData[$counting][3] ;
+			$randData[$counting][0] = round(($randData[$counting][0] / $dataSum[$counting]) , 5);
+			$randData[$counting][1] = round(($randData[$counting][1] / $dataSum[$counting]) , 5);
+			$randData[$counting][2] = round(($randData[$counting][2] / $dataSum[$counting]) , 5);
+			$randData[$counting][3] = round(($randData[$counting][3] / $dataSum[$counting]) , 5);
+			
+			$counting++;
+		}
+		
+		$iterasi = 1;
+		while($flagLooping == false)
+		{
+		
+			for($x = 0; $x < count($dataNorm); $x++)
+			{
+				for($clus = 0; $clus < count($randData[$x]); $clus++)
+				{
+					$dataMiu[$x][0] = round(pow($randData[$x][$clus] , 2), 5);
+					$dataMiu2[$x][$clus] = $dataMiu[$x][0];
+					
+					if(empty($miuTotal[$clus][0])) { $miuTotal[$clus][0] = 0; }
+					$miuTotal[$clus][0] += $dataMiu[$x][0];
+					
+					for($y = 0; $y < count($dataNorm[$x]); $y++)
+					{
+						$dataMiu[$x][$y + 1] = round($dataMiu[$x][0] * $dataNorm[$x][$y], 5);
+						
+						if(empty($miuTotal[$clus][$y + 1])) { $miuTotal[$clus][$y + 1] = 0; }
+						$miuTotal[$clus][$y + 1] += $dataMiu[$x][$y + 1];
+					
+					}
+				}
+				
+			}
+			
+			
+			//echo count($miuTotal) . " >> " . count($miuTotal[0]) . "<br>";
+			for($a = 0; $a < count($miuTotal); $a++)
+			{
+				for($b=1; $b < count($miuTotal[$a]); $b++)
+				{
+					$pusatCluster[$a][$b - 1] = round($miuTotal[$a][$b] / $miuTotal[$a][0], 5);
+				}
+			}
+			
+			/* calculasi fungsi objective */
+			$dataL = array(); $resultObjective = null;
+			$dataL_1 = array(); $totalL = array();
+			for($x = 0; $x < count($dataMiu2); $x++)
+			{
+				for($y = 0; $y < count($dataNorm[$x]); $y++)
+				{
+					for($z = 0; $z < count($pusatCluster)-1; $z++)
+					{
+						if(empty($dataL[$x][$y])) {$dataL[$x][$y] = 0;}
+						$dataL[$x][$y] += pow($dataNorm[$x][$z] - $pusatCluster[$y][$z], 2);	
+					}
+					$dataL[$x][$y] = $dataL[$x][$y] * $dataMiu2[$x][$y];
+					$dataL_1[$x][$y] = pow($dataL[$x][$y] / $dataMiu2[$x][$y] , -1);
+					
+					if(empty($totalL[$x])) { $totalL[$x] = 0; }
+					$totalL[$x] += $dataL_1[$x][$y];
+					
+					$resultObjective += $dataL[$x][$y];
+					
+				}
+				
+			}
+			if($resultObjective <= $epsilon)
+			{
+				$flagLooping = true;
+			}
+			
+			/* new Random */
+			for($x = 0; $x < count($dataL_1); $x++)
+			{
+				for($y = 0; $y < count($dataL_1[$x]); $y++)
+				{
+					$randData[$x][$y] = $dataL_1[$x][$y] / $totalL[$x];
+				}				
+			}
+			
+			if($iterasi == $maxIterasi)
+			{
+				$flagLooping = true;
+			}
+			
+			$iterasi++;
+		
+		}
+		
+		
+		/* rank pusat cluster */
+		$totalRangking = array(); $ranking = array();
+			
+		for($x = 0; $x < count($pusatCluster); $x++)
+		{
+			for($y = 0; $y < count($pusatCluster[$x]); $y++)
+			{
+				if(empty($totalRangking[$x]) ) { $totalRangking[$x] = 0; }
+				$totalRangking[$x] += $pusatCluster[$x][$y];
+			}
+		}
+		
+		$rangking = $totalRangking;
+		$indexRanking = array();
+		rsort($rangking);
+		for($index = 0; $index < count($totalRangking) ; $index++)
+		{
+			$indexRanking[$index] = array_search($totalRangking[$index], $rangking) + 1;
+		}
+		
+		/* pengambilan keputusan */
+		$setNamaCluster = array("Tinggi", "Normal", "Pendek", "Sangat Pendek");
+		$dataAnakResult = array();
+		$maxRand = array(); $resultCluster = array();
+		for($x = 0; $x < count($randData); $x++)
+		{
+			$maxRand[$x] = 0;
+			for($y = 0; $y < count($randData[$x]); $y++)
+			{
+				
+				if($randData[$x][$y] > $maxRand[$x])
+				{
+					$maxRand[$x] = $randData[$x][$y];
+				}
+				if($y == (count($randData[$x]) - 1))
+				{
+					$resultCluster[$x] = array_search($maxRand[$x], $randData[$x]);
+					$dataAnakResult[$x] = $setNamaCluster[$resultCluster[$x]];
+				}
+				
+			}
+		}
+		return $dataAnakResult;
+		
+	}
+	
+	public function dataAnak($afterAdd = false)
+	{
+		if($this->session->userdata('user') != '')
+		{
+			$this->data['hasil'] = $this->stuntingNoTbl();
+			$this->data['posts'] = $this->m_account->getDataAnak();
+			$this->data['tableTittle'] = "Tabel Anak";
+			$this->data['afterAdd'] = $afterAdd;
+			$data['content'] = $this->load->view('v_dataAnak', $this->data, true);
+			
+			$this->load->view('Template/Main', $data);
+		}
+		else
+		{
+			redirect("Stunting");
+		}
+	}
+	
 }

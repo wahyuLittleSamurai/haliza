@@ -36,12 +36,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <span class="nav-link-text">Data Anak</span>
               </a>
             </li>
-            <li class="nav-item">
+            <?php if($this->session->userdata('user') == 'admin') { ?>
+            
+			<li class="nav-item">
               <a class="nav-link <?php echo $this->uri->segment(2) == 'Stunting' ? 'active': '' ?>" href="<?= site_url('Stunting/newcalcStunting'); ?>">
                 <i class="ni ni-single-02 text-yellow"></i>
                 <span class="nav-link-text">Stunting</span>
               </a>
             </li>
+			<li class="nav-item">
+              <a class="nav-link <?php echo $this->uri->segment(2) == 'SettingFuzzy' ? 'active': '' ?>" href="<?= site_url('Stunting/SettingFuzzy'); ?>">
+                <i class="ni ni-active-40 text-yellow"></i>
+                <span class="nav-link-text">Fuzzy C-Means</span>
+              </a>
+            </li>
+			<?php } ?>
 			<li class="nav-item">
               <a class="nav-link <?php echo $this->uri->segment(2) == 'Logout' ? 'active': '' ?>" href="<?= site_url('Stunting/logout'); ?>">
                 <i class="ni ni-settings-gear-65 text-yellow"></i>

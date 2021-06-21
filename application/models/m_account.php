@@ -3,10 +3,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_account extends CI_Model{
 
+	function getPusatCluster()
+	{
+		$this->db->select("*");
+		$this->db->from("tblpusatclsuter");
+		$query = $this->db->get();
+		return $query->result();
+	}
 	function addTenagaKesehatan($data)
 	{
 		$this->db->insert('tblTngKesehatan',$data);
 	}  
+	function getSetting()
+	{
+		 $this->db->select("*"); 
+		 $this->db->from('tblsetting');
+		 $query = $this->db->get();
+		 return $query->result();
+	}
+	function editSetting($data)
+	{
+		$this->db->set('jmlCluster', $data["jmlCluster"]);
+	   $this->db->set('pangkat', $data["pangkat"]);
+	   $this->db->set('maxIterasi', $data['maxIterasi']);
+	   $this->db->set('errorTerkecil', $data['errorTerkecil']);
+	   $this->db->update('tblsetting');
+	}
 	function getTenagaKesehatan()
 	{
 		 $this->db->select("*"); 
